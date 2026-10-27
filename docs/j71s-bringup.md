@@ -34,4 +34,9 @@ not operate the hardware.
 `tools/j71s_adt_report.py` reports a limited subset of a private live Apple
 device tree without printing identifiers or calibration data. Apple device trees
 and calibration data can be unique to a device: keep the raw files private.
+The report includes the length and whether any bytes are nonzero, but never the
+contents or a hash. These properties do not verify that calibration is valid.
+On the tested device the live field was 1,024 bytes and nonzero; the stock
+restore image's tree contained a 31-byte field. The difference does not prove
+what either field contains or whether it can be used by a Linux driver.
 Do not commit firmware or raw captured data.

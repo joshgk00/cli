@@ -70,7 +70,9 @@ def report(blob):
                  'interrupt_words': u32s(spi.properties['interrupts']),
                  'version_words': u32s(spi.properties['spi-version']),
                  'clock_id_words': u32s(spi.properties['clock-ids'])},
-        'touch': {'interrupt_words': u32s(touch.properties['interrupts']), 'functions': wiring},
+        'touch': {'interrupt_words': u32s(touch.properties['interrupts']), 'functions': wiring,
+                  'calibration_bytes': len(touch.properties.get('multi-touch-calibration', b'')),
+                  'calibration_nonzero': any(touch.properties.get('multi-touch-calibration', b''))},
     }
 
 

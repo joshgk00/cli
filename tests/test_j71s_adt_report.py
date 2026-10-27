@@ -13,12 +13,12 @@ def node(name, props=(), children=()):
     return struct.pack('<II', len(records), len(children)) + b''.join(prop(k, v) for k, v in records) + b''.join(children)
 
 
-def fixture(model=b'iPad6,11\0', provider=1):
+def fixture(model=b'iPad6,11\0', provider=1, calibration=b'PRIVATE_CALIBRATION_SENTINEL'):
     word = lambda n: struct.pack('<I', n)
     touch = node('multi-touch', [('compatible', b'multi-touch,j72\0'),
                                 ('interrupts', word(65) + word(0)),
                                 ('function-reset', word(provider) + b'OIPG' + word(75) + word(65537)),
-                                ('multi-touch-calibration', b'PRIVATE_CALIBRATION_SENTINEL')])
+                                ('multi-touch-calibration', calibration)])
     spi = node('spi3', [('compatible', b'spi-1,samsung\0'), ('reg', word(1)),
                         ('interrupts', word(191)), ('spi-version', word(1)),
                         ('clock-ids', word(304))], [touch])
@@ -33,6 +33,8 @@ class J71sReport(unittest.TestCase):
         self.assertEqual(result['spi3']['interrupt_words'], [191])
         self.assertEqual(result['touch']['functions']['function-reset']['provider'], 'gpio')
         self.assertEqual(result['touch']['functions']['function-reset']['arguments'], [75, 65537])
+        self.assertEqual(result['touch']['calibration_bytes'], len(b'PRIVATE_CALIBRATION_SENTINEL'))
+        self.assertTrue(result['touch']['calibration_nonzero'])
         output = json.dumps(result)
         self.assertNotIn('IDSECRET', output)
         self.assertNotIn('PRIVATE_CALIBRATION_SENTINEL', output)
@@ -42,6 +44,11 @@ class J71sReport(unittest.TestCase):
         for blob in (fixture(model=b'iPad7,5\0'), fixture(provider=99), fixture()[:-3]):
             with self.subTest(size=len(blob)), self.assertRaises(ValueError):
                 report(blob)
+
+    def test_zero_filled_calibration_is_not_reported_as_nonzero(self):
+        touch = report(fixture(calibration=bytes(1024)))['touch']
+        self.assertEqual(touch['calibration_bytes'], 1024)
+        self.assertFalse(touch['calibration_nonzero'])
 
 
 if __name__ == '__main__':
