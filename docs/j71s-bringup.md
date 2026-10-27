@@ -12,6 +12,8 @@ ran labwc and Quickshell on the physical 1536 x 2048 framebuffer; a terminal
 and on-screen keyboard appeared, and software-generated keyboard input worked.
 This did not test physical touch or boot the normal installed service lifecycle.
 Neither the test image nor the network block-device prototype is an installer.
+Linux also exposed an Apple backlight device. A small brightness-setting change
+and restoration succeeded through sysfs; the visual change was not observed.
 
 The Linux tree used in that test did not expose touchscreen or internal storage.
 The Apple device tree identifies a `multi-touch,j72` touchscreen on SPI3 and
