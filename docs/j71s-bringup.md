@@ -58,6 +58,11 @@ experimental `apple-dart` driver reset and initialized DART0 with 4 KiB pages
 and four streams. USB serial remained available; no PCIe host or NVMe block
 device appeared. The test did not connect an IOMMU consumer or perform a DMA
 translation and does not establish internal storage support.
+In a follow-up boot, a software-only consumer joined IOMMU group 0 and reported
+a DMA domain, but the DART driver logged a busy-bit timeout for an invalidate
+command on stream 0. The pinned driver's translation setup ignores that return
+value. Therefore the registered domain is not evidence of working translation;
+no physical DMA or internal storage access occurred.
 
 Read-only Linux device metadata shows the Apple I2C adapter and an
 `apple,angel-pmic` device bound to `simple-mfd-i2c`, with an RTC exposed.
