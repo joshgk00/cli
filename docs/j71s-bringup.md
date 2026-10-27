@@ -34,6 +34,11 @@ The captured J71s tree lists PCIe port interrupts 244, 247, 250 and 253,
 first DART interrupt 245, and NVMe MMU interrupt 246. The J71b experimental
 tree uses different interrupt numbers, so its interrupt mapping must not be
 copied to J71s.
+An offline comparison using m1n1's 24-byte local-tunable record layout found
+34 S8000 common-tuning records in the captured tree versus 38 entries in the
+J71b T8010 driver's common-tuning table; the sequences are not identical.
+This is not a complete compatibility analysis and does not validate applying
+the S8000 records. Raw device-tree tuning data remains private.
 
 Read-only Linux device metadata shows the Apple I2C adapter and an
 `apple,angel-pmic` device bound to `simple-mfd-i2c`, with an RTC exposed.
