@@ -34,3 +34,19 @@ class J71sTouchReportTests(unittest.TestCase):
         data['other'] = data.pop('C1F15,1')
         with self.assertRaisesRegex(ValueError, 'profile set'):
             report(plistlib.dumps(data))
+
+    def test_truncated_packet_is_rejected(self):
+        data = profile()
+        entry = data['C1F15,1']
+        entry['Constructed Firmware'] = entry['Constructed Firmware'][:-1]
+        with self.assertRaisesRegex(ValueError, 'length mismatch'):
+            report(plistlib.dumps(data))
+
+    def test_corrupt_header_is_rejected(self):
+        data = profile()
+        entry = data['C1F15,1']
+        packet = bytearray(entry['Constructed Firmware'])
+        packet[10] ^= 1
+        entry['Constructed Firmware'] = bytes(packet)
+        with self.assertRaisesRegex(ValueError, 'header checksum'):
+            report(plistlib.dumps(data))
