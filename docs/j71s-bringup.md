@@ -138,6 +138,10 @@ Both the J81 research and the captured J71s tree identify SPI3 as
 `spi-1,samsung`; the J71s tree also reports SPI version 1. That shared label
 motivates testing the older SPI driver but does not prove identical clocks,
 register behavior, or board wiring.
+The J71s tree reports SPI3 clock-gate word `0x4d` and clock-ID word `0x130`;
+the J81 research reports the same gate word but a different clock ID (`0x12e`).
+These are Apple tree values, not validated Linux clock configuration or a
+license to copy a clock rate or write PMGR registers.
 As an offline feasibility check, that project's patches `0007`, `0096`, and
 `0098` at revision `b94d42f78e04c5465e290340a5b6879bbc5956b6` were applied
 in order to an isolated Hoolock kernel checkout at
