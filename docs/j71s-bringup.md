@@ -55,7 +55,8 @@ using function 1 and preserving a bootloader UART control bit produced plausible
 status, capacity, voltage, current, temperature and charge readings on one
 device across three checks. The gauge values have not been compared with iPadOS,
 and charging is not supported by this test. The experiment is not currently
-part of the adapter.
+part of the adapter. A later host-served desktop test showed the same 24%
+battery value in its top bar; it did not validate charging or an installed boot.
 The host-served read-only desktop test was repeated on that experimental kernel:
 the themed desktop, calendar, terminal and on-screen keyboard rendered, and
 software-generated keyboard input appeared in the terminal. The test still did
