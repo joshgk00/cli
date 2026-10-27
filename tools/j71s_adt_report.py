@@ -114,7 +114,7 @@ def report(blob):
             speed = u32s(bridge.properties['maximum-link-speed'])
             if port != [number] or len(speed) != 1:
                 raise ValueError('Unexpected PCIe port or maximum speed')
-            ports[label] = {'port': port[0], 'maximum_link_speed_generation': speed[0],
+            ports[label] = {'port': port[0], 'maximum_link_speed_word': speed[0],
                             'nvme_mode_marker_present': 'nvme-mode' in bridge.properties}
         storage = {'pcie_reg_words': u32s(pcie.properties['reg']),
                    'pcie_interrupt_words': u32s(pcie.properties['interrupts']),
