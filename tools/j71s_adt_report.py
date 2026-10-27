@@ -82,6 +82,20 @@ def report(blob):
                    'uart_clock_id_words': u32s(uart.properties['clock-ids']),
                    'uart_functions': functions(uart, ('function-tx',)),
                    'gauge_functions': functions(gauge, ('function-battery_swi',))}
+    pcie = nodes.get(ROOT + '/apcie')
+    nvme = nodes.get(ROOT + '/nvme-mmu0')
+    storage = None
+    if (pcie is None) != (nvme is None):
+        raise ValueError('Incomplete PCIe storage nodes')
+    if pcie is not None and nvme is not None:
+        if pcie.properties.get('compatible', b'').rstrip(b'\0') != b'apcie,s8000':
+            raise ValueError('Unexpected PCIe controller compatible')
+        if nvme.properties.get('compatible', b'').rstrip(b'\0') != b'nvme-mmu,s8000':
+            raise ValueError('Unexpected NVMe MMU compatible')
+        storage = {'pcie_reg_words': u32s(pcie.properties['reg']),
+                   'pcie_interrupt_words': u32s(pcie.properties['interrupts']),
+                   'nvme_mmu_reg_words': u32s(nvme.properties['reg']),
+                   'nvme_mmu_interrupt_words': u32s(nvme.properties['interrupts'])}
     return {
         'model': 'iPad6,11',
         'note': 'Raw Apple-tree values; interpretation and address translation need independent verification.',
@@ -93,6 +107,7 @@ def report(blob):
                   'calibration_bytes': len(touch.properties.get('multi-touch-calibration', b'')),
                   'calibration_nonzero': any(touch.properties.get('multi-touch-calibration', b''))},
         'battery': battery,
+        'storage': storage,
     }
 
 
