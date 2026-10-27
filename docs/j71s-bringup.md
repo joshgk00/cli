@@ -58,6 +58,12 @@ device across three checks. After iPadOS reported 100% charge, Linux reported
 supported by this test. The experiment is not currently
 part of the adapter. A later host-served desktop test showed the same 24%
 battery value in its top bar; it did not validate charging or an installed boot.
+An additional RAM-only diagnostic boot counted HDQ response symbols in the
+range where the experimental decoder and TI's UART example differ. Two fresh
+sampling rounds each reported zero such symbols across nine transfers. This
+does not validate the gauge profile, the remaining decoding, or the battery
+percentage; it only means this particular ambiguity was not observed in those
+samples.
 The captured Apple tree identifies a `tristar,cbtl1610` Lightning controller and
 a `charger,k48` node. The J71s test did not expose a charger power-supply device
 and reported battery discharge while USB was connected. These identifiers do
