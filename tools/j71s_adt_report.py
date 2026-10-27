@@ -105,6 +105,7 @@ def report(blob):
             raise ValueError('Invalid PCIe local-tunable record length')
         storage = {'pcie_reg_words': u32s(pcie.properties['reg']),
                    'pcie_interrupt_words': u32s(pcie.properties['interrupts']),
+                   'pcie_clock_gate_words': u32s(pcie.properties['clock-gates']) if 'clock-gates' in pcie.properties else None,
                    'nvme_mmu_reg_words': u32s(nvme.properties['reg']),
                    'nvme_mmu_interrupt_words': u32s(nvme.properties['interrupts']),
                    'pcie_common_tunable_records': len(tuning) // 24 if tuning is not None else None}

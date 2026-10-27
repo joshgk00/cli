@@ -43,6 +43,12 @@ An offline comparison using m1n1's 24-byte local-tunable record layout found
 J71b T8010 driver's common-tuning table; the sequences are not identical.
 This is not a complete compatibility analysis and does not validate applying
 the S8000 records. Raw device-tree tuning data remains private.
+Offline decoding of the J71s PCIe node's six power gate IDs found AUX, REF,
+and LINK0–LINK3 at the same PMGR offsets as the named S8000 Linux power
+domains. The Apple tree gives the link gates a PCIe parent, also matching the
+Linux parent relationships. These matches are evidence for candidate power
+domain descriptions, not proof that a PCIe or NVMe initialization sequence
+is safe or complete. No corresponding register was read or written.
 
 Read-only Linux device metadata shows the Apple I2C adapter and an
 `apple,angel-pmic` device bound to `simple-mfd-i2c`, with an RTC exposed.
