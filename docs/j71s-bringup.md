@@ -64,6 +64,11 @@ sampling rounds each reported zero such symbols across nine transfers. This
 does not validate the gauge profile, the remaining decoding, or the battery
 percentage; it only means this particular ambiguity was not observed in those
 samples.
+Immediately before restarting into iPadOS, Linux reported 88% and discharging;
+the user then observed 100% in iPadOS. This closer comparison confirms a
+displayed-value discrepancy on this device, but does not identify its cause.
+The experimental Linux profile returns the gauge's state-of-charge register
+directly; the comparison does not establish how iPadOS calculates its display.
 The captured Apple tree identifies a `tristar,cbtl1610` Lightning controller and
 a `charger,k48` node. The J71s test did not expose a charger power-supply device
 and reported battery discharge while USB was connected. These identifiers do
