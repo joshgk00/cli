@@ -22,6 +22,12 @@ test. The matching restore image includes multiple BCM4355 C0 firmware
 candidates; their presence does not identify the correct board file or prove
 compatibility.
 
+Read-only Linux device metadata shows the Apple I2C adapter and an
+`apple,angel-pmic` device bound to `simple-mfd-i2c`, with an RTC exposed.
+No power-supply device appeared. The Apple tree identifies this PMU as
+`pmu,d2365` and describes the touchscreen analog-power function through the
+PMU; that does not establish a regulator mapping or a safe power sequence.
+
 The iPadOS 16.7.16 restore image's `J71s.mtprops` contains profile `C1F15,1`,
 packet type `Z2`, and a constructed packet with valid legacy length and
 checksums. Its shape differs from the J71b firmware profile and cannot be fed
