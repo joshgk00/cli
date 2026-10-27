@@ -63,6 +63,12 @@ a DMA domain, but the DART driver logged a busy-bit timeout for an invalidate
 command on stream 0. The pinned driver's translation setup ignores that return
 value. Therefore the registered domain is not evidence of working translation;
 no physical DMA or internal storage access occurred.
+A later isolated boot using an all-stream invalidate also timed out. Five
+DART0 register offsets subsequently read as all ones. This may indicate that
+the hardware block is unavailable, but does not establish when that condition
+began or its cause. In particular, neither the earlier reset return nor the
+reported busy and translation-enable bits establish that the DART was
+responding normally.
 
 Read-only Linux device metadata shows the Apple I2C adapter and an
 `apple,angel-pmic` device bound to `simple-mfd-i2c`, with an RTC exposed.
