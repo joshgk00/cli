@@ -100,6 +100,18 @@ def report(blob):
                    'nvme_mmu_reg_words': u32s(nvme.properties['reg']),
                    'nvme_mmu_interrupt_words': u32s(nvme.properties['interrupts']),
                    'pcie_common_tunable_records': len(tuning) // 24 if tuning is not None else None}
+    tristar = nodes.get(ROOT + '/i2c0/tristar')
+    charger = nodes.get('/device-tree/charger')
+    charging = None
+    if (tristar is None) != (charger is None):
+        raise ValueError('Incomplete charging-related nodes')
+    if tristar is not None and charger is not None:
+        if tristar.properties.get('compatible', b'').rstrip(b'\0') != b'tristar,cbtl1610':
+            raise ValueError('Unexpected Lightning controller compatible')
+        if charger.properties.get('compatible', b'').rstrip(b'\0') != b'charger,k48':
+            raise ValueError('Unexpected charger compatible')
+        charging = {'lightning_controller': 'tristar,cbtl1610', 'charger': 'charger,k48',
+                    'set_charger_function_present': 'function-set_charger' in charger.properties}
     return {
         'model': 'iPad6,11',
         'note': 'Raw Apple-tree values; interpretation and address translation need independent verification.',
@@ -112,6 +124,7 @@ def report(blob):
                   'calibration_nonzero': any(touch.properties.get('multi-touch-calibration', b''))},
         'battery': battery,
         'storage': storage,
+        'charging': charging,
     }
 
 

@@ -57,6 +57,12 @@ device across three checks. The gauge values have not been compared with iPadOS,
 and charging is not supported by this test. The experiment is not currently
 part of the adapter. A later host-served desktop test showed the same 24%
 battery value in its top bar; it did not validate charging or an installed boot.
+The captured Apple tree identifies a `tristar,cbtl1610` Lightning controller and
+a `charger,k48` node. The J71s test did not expose a charger power-supply device
+and reported battery discharge while USB was connected. These identifiers do
+not establish a safe input-current limit or charging-control sequence; the
+offline report does not print battery IDs, Lightning identifiers, charge
+curves or raw charger functions.
 The host-served read-only desktop test was repeated on that experimental kernel:
 the themed desktop, calendar, terminal and on-screen keyboard rendered, and
 software-generated keyboard input appeared in the terminal. The test still did

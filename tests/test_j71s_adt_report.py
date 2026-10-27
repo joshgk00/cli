@@ -15,7 +15,7 @@ def node(name, props=(), children=()):
 
 def fixture(model=b'iPad6,11\0', provider=1, calibration=b'PRIVATE_CALIBRATION_SENTINEL',
             battery=False, storage=False, pcie_compatible=b'apcie,s8000\0',
-            tuning=b'PRIVATE_TUNABLE_SENTINEL'):
+            tuning=b'PRIVATE_TUNABLE_SENTINEL', charging=False):
     word = lambda n: struct.pack('<I', n)
     touch = node('multi-touch', [('compatible', b'multi-touch,j72\0'),
                                 ('interrupts', word(65) + word(0)),
@@ -41,7 +41,15 @@ def fixture(model=b'iPad6,11\0', provider=1, calibration=b'PRIVATE_CALIBRATION_S
                                       ('apcie-common-tunables', tuning)]))
         children.append(node('nvme-mmu0', [('compatible', b'nvme-mmu,s8000\0'), ('reg', word(2)),
                                           ('interrupts', word(246))]))
-    return node('device-tree', [('model', model)], [chosen, node('arm-io', children=children)])
+    root_children = [chosen]
+    if charging:
+        children.append(node('i2c0', children=[node('tristar', [('compatible', b'tristar,cbtl1610\0'),
+                                                               ('esn', b'PRIVATE_ESN')])]))
+        root_children.append(node('charger', [('compatible', b'charger,k48\0'),
+                                              ('battery-id', b'PRIVATE_BATTERY_ID'),
+                                              ('function-set_charger', b'PRIVATE_FUNCTION')]))
+    root_children.append(node('arm-io', children=children))
+    return node('device-tree', [('model', model)], root_children)
 
 
 class J71sReport(unittest.TestCase):
@@ -87,6 +95,14 @@ class J71sReport(unittest.TestCase):
     def test_storage_rejects_truncated_tuning(self):
         with self.assertRaisesRegex(ValueError, 'tunable record length'):
             report(fixture(storage=True, tuning=b'partial'))
+
+    def test_charging_report_omits_device_specific_properties(self):
+        result = report(fixture(charging=True))
+        self.assertEqual(result['charging']['lightning_controller'], 'tristar,cbtl1610')
+        self.assertTrue(result['charging']['set_charger_function_present'])
+        encoded = json.dumps(result)
+        for secret in ('PRIVATE_ESN', 'PRIVATE_BATTERY_ID', 'PRIVATE_FUNCTION'):
+            self.assertNotIn(secret, encoded)
 
 
 if __name__ == '__main__':
