@@ -130,6 +130,14 @@ as potential causes of failed firmware acknowledgment on that other device.
 J81 uses a different PMU and wiring; its power and SPI settings require
 independent verification before applying them to J71s. Its observed packet
 behavior is a reference, not a validated J71s boot procedure.
+As an offline feasibility check, that project's patches `0007`, `0096`, and
+`0098` at revision `b94d42f78e04c5465e290340a5b6879bbc5956b6` were applied
+in order to an isolated Hoolock kernel checkout at
+`6831bc701a6ce059e71e5aaa9488c9195bea6927`; `drivers/spi/spi-apple.o` built
+with the J71s kernel configuration and Orchard's LLVM 19 toolchain. The last
+patch applied with line offsets. This compiled only a driver object, not a
+bootable kernel, and did not exercise SPI hardware or establish J71s clock,
+power, pinmux, or touch compatibility. The patches are not part of this branch.
 `tools/j71s_touch_report.py` checks a locally extracted profile offline; it does
 not operate the hardware.
 `tools/j71s_touch_personality.py` summarizes an allowlist of static J71s
