@@ -117,6 +117,11 @@ checksums. Its shape differs from the J71b firmware profile and cannot be fed
 to the J71b converter unchanged. The matching iPadOS kernel metadata names an
 `AppleMultitouchN1SPI` personality for `multi-touch,j72`. These observations do
 not establish the power, calibration, firmware upload or input-report sequence.
+The independently documented [J172 touch implementation](https://github.com/Pauli1Go/HoolockLinux-bringup-docs/blob/c9d02db/docs/touch.md)
+is a useful architectural reference: its A10 implementation combines a touch
+clock, SmartIO DMA, SPI controller and Z2 protocol state machine. It is tested
+on a different board and uses HBPP14 firmware and board-specific power wiring;
+neither its sequence nor its GPIO numbers establish a safe J71s implementation.
 `tools/j71s_touch_report.py` checks a locally extracted profile offline; it does
 not operate the hardware.
 `tools/j71s_touch_personality.py` summarizes an allowlist of static J71s
