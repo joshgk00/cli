@@ -52,7 +52,12 @@ and LINK0–LINK3 at the same PMGR offsets as the named S8000 Linux power
 domains. The Apple tree gives the link gates a PCIe parent, also matching the
 Linux parent relationships. These matches are evidence for candidate power
 domain descriptions, not proof that a PCIe or NVMe initialization sequence
-is safe or complete. No corresponding register was read or written.
+is safe or complete. The offline comparison accessed no hardware registers.
+In a later DART0-only RAM boot, the PCIe power domain was enabled and the
+experimental `apple-dart` driver reset and initialized DART0 with 4 KiB pages
+and four streams. USB serial remained available; no PCIe host or NVMe block
+device appeared. The test did not connect an IOMMU consumer or perform a DMA
+translation and does not establish internal storage support.
 
 Read-only Linux device metadata shows the Apple I2C adapter and an
 `apple,angel-pmic` device bound to `simple-mfd-i2c`, with an RTC exposed.
