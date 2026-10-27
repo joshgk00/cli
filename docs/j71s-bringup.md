@@ -30,6 +30,10 @@ the NVMe MMU describes `0x601004000` and `0x601000000`. The J71b implementation
 uses some of the same addresses, but also has T8010-specific initialization
 and tuning. Address similarities alone do not establish S8000 compatibility or
 make those register writes safe. No PCIe or NVMe registers were accessed.
+The captured J71s tree lists PCIe port interrupts 244, 247, 250 and 253,
+first DART interrupt 245, and NVMe MMU interrupt 246. The J71b experimental
+tree uses different interrupt numbers, so its interrupt mapping must not be
+copied to J71s.
 
 Read-only Linux device metadata shows the Apple I2C adapter and an
 `apple,angel-pmic` device bound to `simple-mfd-i2c`, with an RTC exposed.
