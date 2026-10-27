@@ -69,6 +69,10 @@ the user then observed 100% in iPadOS. This closer comparison confirms a
 displayed-value discrepancy on this device, but does not identify its cause.
 The experimental Linux profile returns the gauge's state-of-charge register
 directly; the comparison does not establish how iPadOS calculates its display.
+In that iPadOS session, its battery service also reported 100%, external power
+connected, external charging capability false, and not charging. This single
+observation at a displayed 100% does not establish why charging capability was
+reported false or how the port behaves with a less-full battery.
 The captured Apple tree identifies a `tristar,cbtl1610` Lightning controller and
 a `charger,k48` node. The J71s test did not expose a charger power-supply device
 and reported battery discharge while USB was connected. These identifiers do
