@@ -58,6 +58,12 @@ device tree and prints a limited wiring report without device identity or
 calibration data. Keep the raw ADT private. This offline tool does not add an
 adapter or imply installation support.
 
+`python tools/j71s_touch_report.py J71s.mtprops` checks the legacy Z2 packet
+length and checksums in a locally extracted J71s firmware profile. This is an
+offline integrity check only; it does not establish the initialization or
+calibration sequence and does not add touchscreen support. Obtain the file
+from a verified matching Apple restore image; do not commit firmware.
+
 - [Release publishing and updates](docs/releases.md)
 - [Device operation protocol](docs/device-protocol.md)
 - [Host adapter contract](docs/adapter-contract.md)
