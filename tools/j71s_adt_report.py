@@ -51,6 +51,14 @@ def report(blob):
         raise ValueError('Unexpected SPI controller compatible')
     if touch.properties.get('compatible', b'').rstrip(b'\0') != b'multi-touch,j72':
         raise ValueError('Unexpected touchscreen compatible')
+    spi_ids = u32s(spi.properties['clock-ids'])
+    table = nodes[ROOT].properties.get('clock-frequencies')
+    candidate_clock = None
+    if table is not None:
+        frequencies = u32s(table)
+        if len(spi_ids) != 1 or (spi_ids[0] & 0xff) >= len(frequencies):
+            raise ValueError('Invalid SPI clock ID or frequency table')
+        candidate_clock = frequencies[spi_ids[0] & 0xff]
     def functions(device, names):
         result = {}
         for name in names:
@@ -118,8 +126,9 @@ def report(blob):
         'spi3': {'reg_words': u32s(spi.properties['reg']),
                  'interrupt_words': u32s(spi.properties['interrupts']),
                  'version_words': u32s(spi.properties['spi-version']),
-                 'clock_id_words': u32s(spi.properties['clock-ids']),
-                 'clock_gate_words': u32s(spi.properties['clock-gates']) if 'clock-gates' in spi.properties else None},
+                 'clock_id_words': spi_ids,
+                 'clock_gate_words': u32s(spi.properties['clock-gates']) if 'clock-gates' in spi.properties else None,
+                 'candidate_clock_hz_low_byte_index': candidate_clock},
         'touch': {'interrupt_words': u32s(touch.properties['interrupts']), 'functions': wiring,
                   'calibration_bytes': len(touch.properties.get('multi-touch-calibration', b'')),
                   'calibration_nonzero': any(touch.properties.get('multi-touch-calibration', b''))},

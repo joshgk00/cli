@@ -15,7 +15,7 @@ def node(name, props=(), children=()):
 
 def fixture(model=b'iPad6,11\0', provider=1, calibration=b'PRIVATE_CALIBRATION_SENTINEL',
             battery=False, storage=False, pcie_compatible=b'apcie,s8000\0',
-            tuning=b'PRIVATE_TUNABLE_SENTINEL', charging=False):
+            tuning=b'PRIVATE_TUNABLE_SENTINEL', charging=False, clock_table=True, spi_clock_id=304):
     word = lambda n: struct.pack('<I', n)
     touch = node('multi-touch', [('compatible', b'multi-touch,j72\0'),
                                 ('interrupts', word(65) + word(0)),
@@ -23,7 +23,7 @@ def fixture(model=b'iPad6,11\0', provider=1, calibration=b'PRIVATE_CALIBRATION_S
                                 ('multi-touch-calibration', calibration)])
     spi = node('spi3', [('compatible', b'spi-1,samsung\0'), ('reg', word(1)),
                         ('interrupts', word(191)), ('spi-version', word(1)),
-                        ('clock-ids', word(304)), ('clock-gates', word(77))], [touch])
+                        ('clock-ids', word(spi_clock_id)), ('clock-gates', word(77))], [touch])
     gpio = node('gpio', [('AAPL,phandle', word(1))])
     chosen = node('chosen', [('unique-chip-id', b'IDSECRET')])
     children = [gpio, spi]
@@ -48,7 +48,10 @@ def fixture(model=b'iPad6,11\0', provider=1, calibration=b'PRIVATE_CALIBRATION_S
         root_children.append(node('charger', [('compatible', b'charger,k48\0'),
                                               ('battery-id', b'PRIVATE_BATTERY_ID'),
                                               ('function-set_charger', b'PRIVATE_FUNCTION')]))
-    root_children.append(node('arm-io', children=children))
+    frequencies = bytearray(96 * 4)
+    struct.pack_into('<I', frequencies, 48 * 4, 61538461)
+    clock_props = [('clock-frequencies', bytes(frequencies))] if clock_table else []
+    root_children.append(node('arm-io', clock_props, children))
     return node('device-tree', [('model', model)], root_children)
 
 
@@ -57,6 +60,7 @@ class J71sReport(unittest.TestCase):
         result = report(fixture())
         self.assertEqual(result['spi3']['interrupt_words'], [191])
         self.assertEqual(result['spi3']['clock_gate_words'], [77])
+        self.assertEqual(result['spi3']['candidate_clock_hz_low_byte_index'], 61538461)
         self.assertEqual(result['touch']['functions']['function-reset']['provider'], 'gpio')
         self.assertEqual(result['touch']['functions']['function-reset']['arguments'], [75, 65537])
         self.assertEqual(result['touch']['calibration_bytes'], len(b'PRIVATE_CALIBRATION_SENTINEL'))
@@ -70,6 +74,11 @@ class J71sReport(unittest.TestCase):
         for blob in (fixture(model=b'iPad7,5\0'), fixture(provider=99), fixture()[:-3]):
             with self.subTest(size=len(blob)), self.assertRaises(ValueError):
                 report(blob)
+
+    def test_optional_clock_table_and_invalid_index(self):
+        self.assertIsNone(report(fixture(clock_table=False))['spi3']['candidate_clock_hz_low_byte_index'])
+        with self.assertRaisesRegex(ValueError, 'clock ID'):
+            report(fixture(spi_clock_id=0x1ff))
 
     def test_zero_filled_calibration_is_not_reported_as_nonzero(self):
         touch = report(fixture(calibration=bytes(1024)))['touch']

@@ -142,6 +142,13 @@ The J71s tree reports SPI3 clock-gate word `0x4d` and clock-ID word `0x130`;
 the J81 research reports the same gate word but a different clock ID (`0x12e`).
 These are Apple tree values, not validated Linux clock configuration or a
 license to copy a clock rate or write PMGR registers.
+Using the low-byte table lookup proposed in the
+[J81 SPI clock investigation](https://github.com/mattonik/ipad-nixos/blob/b94d42f78e04c5465e290340a5b6879bbc5956b6/research/2026-10-12-spi3-clock.md),
+J71s SPI ID `0x130` selects entry 48 of the captured 96-word
+`clock-frequencies` table, containing 61,538,461 Hz. The same lookup for its
+UART5 ID `0x118` gives 24 MHz, matching the experimental UART clock. This is
+an offline candidate, not a measurement or proof of the running SPI clock;
+do not enable a controller or set timing based solely on this inference.
 As an offline feasibility check, that project's patches `0007`, `0096`, and
 `0098` at revision `b94d42f78e04c5465e290340a5b6879bbc5956b6` were applied
 in order to an isolated Hoolock kernel checkout at
