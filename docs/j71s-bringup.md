@@ -147,9 +147,14 @@ As an offline feasibility check, that project's patches `0007`, `0096`, and
 in order to an isolated Hoolock kernel checkout at
 `6831bc701a6ce059e71e5aaa9488c9195bea6927`; `drivers/spi/spi-apple.o` built
 with the J71s kernel configuration and Orchard's LLVM 19 toolchain. The last
-patch applied with line offsets. This compiled only a driver object, not a
-bootable kernel, and did not exercise SPI hardware or establish J71s clock,
+patch applied with line offsets. This initial check compiled only a driver
+object and did not exercise SPI hardware or establish J71s clock,
 power, pinmux, or touch compatibility. The patches are not part of this branch.
+Subsequently, the full kernel image built successfully in that isolated tree
+after adding the previously tested experimental battery changes. Its config
+matched the J71s config; the compressed image SHA-256 is
+`d244dca6b0a0d030c399321796d85ec6ad9820e0900edf9c863492b6c8984403`.
+It has not been packaged or booted, and it adds no J71s SPI device-tree node.
 `tools/j71s_touch_report.py` checks a locally extracted profile offline; it does
 not operate the hardware.
 `tools/j71s_touch_personality.py` summarizes an allowlist of static J71s
