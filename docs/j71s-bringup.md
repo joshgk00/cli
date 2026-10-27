@@ -66,6 +66,23 @@ curves or raw charger functions.
 An older iPad mini Linux project has a charger driver for a different D1946
 PMU; its current-limit register and behavior cannot be assumed to apply to the
 J71s D2365. No charger-control registers have been written in this experiment.
+On the tested host, the RAM gadget enumerated at USB 2 high speed (480 Mb/s)
+and advertised `bMaxPower` 500 mA, matching its kernel's
+`CONFIG_USB_GADGET_VBUS_DRAW=500`. This is the device configuration's declared
+maximum, not a measurement of host-port output or actual input current. The
+[USB-IF standard-port rules](https://compliance.usb.org/index.asp?Format=Standard&UpdateFile=Policies)
+limit a USB 2 peripheral on a standard downstream port to 500 mA (2.5 W at 5 V).
+[Apple lists a 12 W adapter](https://support.apple.com/en-us/HT210133) for the
+iPad 5 in many regions, with 10 W in some. The battery gauge reported negative
+current during this test. These facts make limited USB power a plausible
+contributor, but do not distinguish host capacity from device-side charging
+configuration; an actual inline measurement and hardware-specific charger
+research would be needed. Do not infer that 10 or 12 W is a minimum required
+to charge.
+The host's Apple MFi fast-charge driver was loaded but not bound to this RAM
+gadget (`05ac:4142`). The [Linux driver](https://github.com/torvalds/linux/blob/master/drivers/usb/misc/apple-mfi-fastcharge.c)
+matches a different product-ID range and uses a device protocol. Changing the
+identifier alone would not implement that protocol or establish safe charging.
 The host-served read-only desktop test was repeated on that experimental kernel:
 the themed desktop, calendar, terminal and on-screen keyboard rendered, and
 software-generated keyboard input appeared in the terminal. The test still did
