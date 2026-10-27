@@ -76,6 +76,8 @@ reported false or how the port behaves with a less-full battery.
 Moving the connected, unlocked iPad to the computer's other USB port produced
 the same iPadOS battery-service fields at a displayed 100%. This does not
 measure either port's output or rule out a cable or negotiation issue.
+The subsequent diagnostic Linux boot on that second port also reported battery
+discharge; its capacity reading was 87%. Charging remains unverified in Linux.
 The captured Apple tree identifies a `tristar,cbtl1610` Lightning controller and
 a `charger,k48` node. The J71s test did not expose a charger power-supply device
 and reported battery discharge while USB was connected. These identifiers do
@@ -122,6 +124,12 @@ is a useful architectural reference: its A10 implementation combines a touch
 clock, SmartIO DMA, SPI controller and Z2 protocol state machine. It is tested
 on a different board and uses HBPP14 firmware and board-specific power wiring;
 neither its sequence nor its GPIO numbers establish a safe J71s implementation.
+Separate [J81 N1 touchscreen research](https://github.com/mattonik/ipad-nixos/blob/b94d42f78e04c5465e290340a5b6879bbc5956b6/research/2026-10-11-touch-no-ack-analysis.md)
+examines an older N1 SPI implementation and identifies bit order and sequencing
+as potential causes of failed firmware acknowledgment on that other device.
+J81 uses a different PMU and wiring; its power and SPI settings require
+independent verification before applying them to J71s. Its observed packet
+behavior is a reference, not a validated J71s boot procedure.
 `tools/j71s_touch_report.py` checks a locally extracted profile offline; it does
 not operate the hardware.
 `tools/j71s_touch_personality.py` summarizes an allowlist of static J71s
