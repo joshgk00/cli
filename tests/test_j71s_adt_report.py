@@ -14,7 +14,8 @@ def node(name, props=(), children=()):
 
 
 def fixture(model=b'iPad6,11\0', provider=1, calibration=b'PRIVATE_CALIBRATION_SENTINEL',
-            battery=False, storage=False, pcie_compatible=b'apcie,s8000\0'):
+            battery=False, storage=False, pcie_compatible=b'apcie,s8000\0',
+            tuning=b'PRIVATE_TUNABLE_SENTINEL'):
     word = lambda n: struct.pack('<I', n)
     touch = node('multi-touch', [('compatible', b'multi-touch,j72\0'),
                                 ('interrupts', word(65) + word(0)),
@@ -37,7 +38,7 @@ def fixture(model=b'iPad6,11\0', provider=1, calibration=b'PRIVATE_CALIBRATION_S
     if storage:
         children.append(node('apcie', [('compatible', pcie_compatible), ('reg', word(1)),
                                       ('interrupts', word(244)),
-                                      ('apcie-common-tunables', b'PRIVATE_TUNABLE_SENTINEL')]))
+                                      ('apcie-common-tunables', tuning)]))
         children.append(node('nvme-mmu0', [('compatible', b'nvme-mmu,s8000\0'), ('reg', word(2)),
                                           ('interrupts', word(246))]))
     return node('device-tree', [('model', model)], [chosen, node('arm-io', children=children)])
@@ -76,11 +77,16 @@ class J71sReport(unittest.TestCase):
         result = report(fixture(storage=True))
         self.assertEqual(result['storage']['pcie_interrupt_words'], [244])
         self.assertEqual(result['storage']['nvme_mmu_interrupt_words'], [246])
+        self.assertEqual(result['storage']['pcie_common_tunable_records'], 1)
         self.assertNotIn('PRIVATE_TUNABLE_SENTINEL', json.dumps(result))
 
     def test_storage_rejects_unexpected_controller(self):
         with self.assertRaisesRegex(ValueError, 'Unexpected PCIe'):
             report(fixture(storage=True, pcie_compatible=b'apcie,t8010\0'))
+
+    def test_storage_rejects_truncated_tuning(self):
+        with self.assertRaisesRegex(ValueError, 'tunable record length'):
+            report(fixture(storage=True, tuning=b'partial'))
 
 
 if __name__ == '__main__':

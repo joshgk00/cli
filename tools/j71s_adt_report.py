@@ -92,10 +92,14 @@ def report(blob):
             raise ValueError('Unexpected PCIe controller compatible')
         if nvme.properties.get('compatible', b'').rstrip(b'\0') != b'nvme-mmu,s8000':
             raise ValueError('Unexpected NVMe MMU compatible')
+        tuning = pcie.properties.get('apcie-common-tunables')
+        if tuning is not None and len(tuning) % 24:
+            raise ValueError('Invalid PCIe local-tunable record length')
         storage = {'pcie_reg_words': u32s(pcie.properties['reg']),
                    'pcie_interrupt_words': u32s(pcie.properties['interrupts']),
                    'nvme_mmu_reg_words': u32s(nvme.properties['reg']),
-                   'nvme_mmu_interrupt_words': u32s(nvme.properties['interrupts'])}
+                   'nvme_mmu_interrupt_words': u32s(nvme.properties['interrupts']),
+                   'pcie_common_tunable_records': len(tuning) // 24 if tuning is not None else None}
     return {
         'model': 'iPad6,11',
         'note': 'Raw Apple-tree values; interpretation and address translation need independent verification.',
