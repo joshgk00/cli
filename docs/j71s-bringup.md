@@ -130,6 +130,10 @@ as potential causes of failed firmware acknowledgment on that other device.
 J81 uses a different PMU and wiring; its power and SPI settings require
 independent verification before applying them to J71s. Its observed packet
 behavior is a reference, not a validated J71s boot procedure.
+Both the J81 research and the captured J71s tree identify SPI3 as
+`spi-1,samsung`; the J71s tree also reports SPI version 1. That shared label
+motivates testing the older SPI driver but does not prove identical clocks,
+register behavior, or board wiring.
 As an offline feasibility check, that project's patches `0007`, `0096`, and
 `0098` at revision `b94d42f78e04c5465e290340a5b6879bbc5956b6` were applied
 in order to an isolated Hoolock kernel checkout at
