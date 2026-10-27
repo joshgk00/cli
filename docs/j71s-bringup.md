@@ -38,6 +38,10 @@ The captured J71s tree lists PCIe port interrupts 244, 247, 250 and 253,
 first DART interrupt 245, and NVMe MMU interrupt 246. The J71b experimental
 tree uses different interrupt numbers, so its interrupt mapping must not be
 copied to J71s.
+The Apple tree places an `s3e` node under bridge 0, which has an `nvme-mode`
+marker and maximum link-speed value 2; the BCM4355 Wi-Fi node is under bridge 1,
+with maximum link-speed value 1. These are topology descriptions and limits,
+not evidence that either link has trained or that storage access is safe.
 An offline comparison using m1n1's 24-byte local-tunable record layout found
 34 S8000 common-tuning records in the captured tree versus 38 entries in the
 J71b T8010 driver's common-tuning table; the sequences are not identical.

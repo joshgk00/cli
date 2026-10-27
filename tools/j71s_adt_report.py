@@ -103,9 +103,23 @@ def report(blob):
         tuning = pcie.properties.get('apcie-common-tunables')
         if tuning is not None and len(tuning) % 24:
             raise ValueError('Invalid PCIe local-tunable record length')
+        ports = {}
+        for number, label in ((0, 'storage'), (1, 'wifi')):
+            bridge = nodes.get(ROOT + f'/apcie/pci-bridge{number}')
+            if bridge is None:
+                continue
+            if bridge.properties.get('compatible', b'').rstrip(b'\0') != b'apcie-bridge':
+                raise ValueError('Unexpected PCIe bridge compatible')
+            port = u32s(bridge.properties['apcie-port'])
+            speed = u32s(bridge.properties['maximum-link-speed'])
+            if port != [number] or len(speed) != 1:
+                raise ValueError('Unexpected PCIe port or maximum speed')
+            ports[label] = {'port': port[0], 'maximum_link_speed_generation': speed[0],
+                            'nvme_mode_marker_present': 'nvme-mode' in bridge.properties}
         storage = {'pcie_reg_words': u32s(pcie.properties['reg']),
                    'pcie_interrupt_words': u32s(pcie.properties['interrupts']),
                    'pcie_clock_gate_words': u32s(pcie.properties['clock-gates']) if 'clock-gates' in pcie.properties else None,
+                   'ports': ports,
                    'nvme_mmu_reg_words': u32s(nvme.properties['reg']),
                    'nvme_mmu_interrupt_words': u32s(nvme.properties['interrupts']),
                    'pcie_common_tunable_records': len(tuning) // 24 if tuning is not None else None}

@@ -37,10 +37,14 @@ def fixture(model=b'iPad6,11\0', provider=1, calibration=b'PRIVATE_CALIBRATION_S
                                        ('reg', word(1)), ('interrupts', word(197)),
                                        ('clock-ids', word(280)), ('function-tx', function)], [gauge]))
     if storage:
+        ports = [node('pci-bridge0', [('compatible', b'apcie-bridge\0'), ('apcie-port', word(0)),
+                                      ('maximum-link-speed', word(2)), ('nvme-mode', b'')]),
+                 node('pci-bridge1', [('compatible', b'apcie-bridge\0'), ('apcie-port', word(1)),
+                                      ('maximum-link-speed', word(1))])]
         children.append(node('apcie', [('compatible', pcie_compatible), ('reg', word(1)),
                                       ('interrupts', word(244)),
                                       ('clock-gates', b''.join(word(n) for n in range(57, 63))),
-                                      ('apcie-common-tunables', tuning)]))
+                                      ('apcie-common-tunables', tuning)], ports))
         children.append(node('nvme-mmu0', [('compatible', b'nvme-mmu,s8000\0'), ('reg', word(2)),
                                           ('interrupts', word(246))]))
     root_children = [chosen]
@@ -98,6 +102,8 @@ class J71sReport(unittest.TestCase):
         result = report(fixture(storage=True))
         self.assertEqual(result['storage']['pcie_interrupt_words'], [244])
         self.assertEqual(result['storage']['pcie_clock_gate_words'], [57, 58, 59, 60, 61, 62])
+        self.assertTrue(result['storage']['ports']['storage']['nvme_mode_marker_present'])
+        self.assertEqual(result['storage']['ports']['wifi']['port'], 1)
         self.assertEqual(result['storage']['nvme_mmu_interrupt_words'], [246])
         self.assertEqual(result['storage']['pcie_common_tunable_records'], 1)
         self.assertNotIn('PRIVATE_TUNABLE_SENTINEL', json.dumps(result))
