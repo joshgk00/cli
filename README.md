@@ -52,6 +52,12 @@ see the [launcher build and publication instructions](https://github.com/Orchard
 
 ## Documentation
 
+For iPad 5 Wi-Fi (`iPad6,11` / J71s) bring-up, the source checkout includes
+`python tools/j71s_adt_report.py PRIVATE_ADT`. It validates the captured Apple
+device tree and prints a limited wiring report without device identity or
+calibration data. Keep the raw ADT private. This offline tool does not add an
+adapter or imply installation support.
+
 - [Release publishing and updates](docs/releases.md)
 - [Device operation protocol](docs/device-protocol.md)
 - [Host adapter contract](docs/adapter-contract.md)
