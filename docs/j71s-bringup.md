@@ -30,6 +30,10 @@ the NVMe MMU describes `0x601004000` and `0x601000000`. The J71b implementation
 uses some of the same addresses, but also has T8010-specific initialization
 and tuning. Address similarities alone do not establish S8000 compatibility or
 make those register writes safe. No PCIe or NVMe registers were accessed.
+The separate [J81 PCIe investigation](https://github.com/mattonik/ipad-nixos/blob/b94d42f78e04c5465e290340a5b6879bbc5956b6/research/t7000-pcie-hardware-findings.md)
+reports that enabling its DART device caused a boot hang. J81 is a different
+SoC; this is not a prediction for J71s, but is evidence that merely enabling a
+similar-looking DART node is not a validated way to bring up storage.
 The captured J71s tree lists PCIe port interrupts 244, 247, 250 and 253,
 first DART interrupt 245, and NVMe MMU interrupt 246. The J71b experimental
 tree uses different interrupt numbers, so its interrupt mapping must not be
