@@ -63,6 +63,9 @@ and reported battery discharge while USB was connected. These identifiers do
 not establish a safe input-current limit or charging-control sequence; the
 offline report does not print battery IDs, Lightning identifiers, charge
 curves or raw charger functions.
+An older iPad mini Linux project has a charger driver for a different D1946
+PMU; its current-limit register and behavior cannot be assumed to apply to the
+J71s D2365. No charger-control registers have been written in this experiment.
 The host-served read-only desktop test was repeated on that experimental kernel:
 the themed desktop, calendar, terminal and on-screen keyboard rendered, and
 software-generated keyboard input appeared in the terminal. The test still did
