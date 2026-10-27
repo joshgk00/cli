@@ -96,6 +96,11 @@ to the J71b converter unchanged. The matching iPadOS kernel metadata names an
 not establish the power, calibration, firmware upload or input-report sequence.
 `tools/j71s_touch_report.py` checks a locally extracted profile offline; it does
 not operate the hardware.
+`tools/j71s_touch_personality.py` summarizes an allowlist of static J71s
+personality metadata from a local `ipsw kernel kexts --json` report. Obtain the
+kernelcache from a separately verified matching restore image. The utility
+does not verify the restore image, inspect live values, generate firmware, or
+establish a safe power-up sequence.
 
 `tools/j71s_adt_report.py` reports a limited subset of a private live Apple
 device tree without printing identifiers or calibration data. Apple device trees
