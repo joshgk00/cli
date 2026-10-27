@@ -51,18 +51,37 @@ def report(blob):
         raise ValueError('Unexpected SPI controller compatible')
     if touch.properties.get('compatible', b'').rstrip(b'\0') != b'multi-touch,j72':
         raise ValueError('Unexpected touchscreen compatible')
-    wiring = {}
-    for name in FUNCTIONS:
-        value = touch.properties.get(name)
-        if value is None:
-            continue
-        if len(value) < 8 or len(value) % 4:
-            raise ValueError('Invalid hardware function: ' + name)
-        handle = struct.unpack('<I', value[:4])[0]
-        if handle not in handles:
-            raise ValueError('Unknown hardware function provider: ' + name)
-        wiring[name] = {'provider': handles[handle], 'operation_hex': value[4:8].hex(),
-                        'arguments': u32s(value[8:])}
+    def functions(device, names):
+        result = {}
+        for name in names:
+            value = device.properties.get(name)
+            if value is None:
+                continue
+            if len(value) < 8 or len(value) % 4:
+                raise ValueError('Invalid hardware function: ' + name)
+            handle = struct.unpack('<I', value[:4])[0]
+            if handle not in handles:
+                raise ValueError('Unknown hardware function provider: ' + name)
+            result[name] = {'provider': handles[handle], 'operation_hex': value[4:8].hex(),
+                            'arguments': u32s(value[8:])}
+        return result
+
+    wiring = functions(touch, FUNCTIONS)
+    uart = nodes.get(ROOT + '/uart5')
+    gauge = nodes.get(ROOT + '/uart5/gas-gauge')
+    battery = None
+    if (uart is None) != (gauge is None):
+        raise ValueError('Incomplete battery gauge nodes')
+    if uart is not None and gauge is not None:
+        if uart.properties.get('compatible', b'').rstrip(b'\0') != b'uart-1,samsung':
+            raise ValueError('Unexpected battery UART compatible')
+        if gauge.properties.get('compatible', b'').rstrip(b'\0').split(b'\0') != [b'gas-gauge,bq27540', b'gas-gauge,hdq']:
+            raise ValueError('Unexpected battery gauge compatible')
+        battery = {'uart_reg_words': u32s(uart.properties['reg']),
+                   'uart_interrupt_words': u32s(uart.properties['interrupts']),
+                   'uart_clock_id_words': u32s(uart.properties['clock-ids']),
+                   'uart_functions': functions(uart, ('function-tx',)),
+                   'gauge_functions': functions(gauge, ('function-battery_swi',))}
     return {
         'model': 'iPad6,11',
         'note': 'Raw Apple-tree values; interpretation and address translation need independent verification.',
@@ -73,6 +92,7 @@ def report(blob):
         'touch': {'interrupt_words': u32s(touch.properties['interrupts']), 'functions': wiring,
                   'calibration_bytes': len(touch.properties.get('multi-touch-calibration', b'')),
                   'calibration_nonzero': any(touch.properties.get('multi-touch-calibration', b''))},
+        'battery': battery,
     }
 
 

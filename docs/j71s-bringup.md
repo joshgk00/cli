@@ -29,6 +29,10 @@ Read-only Linux device metadata shows the Apple I2C adapter and an
 No power-supply device appeared. The Apple tree identifies this PMU as
 `pmu,d2365` and describes the touchscreen analog-power function through the
 PMU; that does not establish a regulator mapping or a safe power sequence.
+It also identifies a BQ27540 HDQ fuel gauge on UART5. The J71b project has
+experimental HDQ support for that gauge family, but this device's interrupt
+and pin wiring differ. A J71s battery experiment requires its own validated
+device tree and physical testing; it is not currently part of the adapter.
 
 The iPadOS 16.7.16 restore image's `J71s.mtprops` contains profile `C1F15,1`,
 packet type `Z2`, and a constructed packet with valid legacy length and
