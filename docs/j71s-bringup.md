@@ -24,6 +24,13 @@ test. The matching restore image includes multiple BCM4355 C0 firmware
 candidates; their presence does not identify the correct board file or prove
 compatibility.
 
+An offline translation of the captured Apple tree locates the S8000 PCIe
+configuration range at `0x610000000` and its first PCIe DART at `0x601008000`;
+the NVMe MMU describes `0x601004000` and `0x601000000`. The J71b implementation
+uses some of the same addresses, but also has T8010-specific initialization
+and tuning. Address similarities alone do not establish S8000 compatibility or
+make those register writes safe. No PCIe or NVMe registers were accessed.
+
 Read-only Linux device metadata shows the Apple I2C adapter and an
 `apple,angel-pmic` device bound to `simple-mfd-i2c`, with an RTC exposed.
 No power-supply device appeared in the original baseline. The Apple tree identifies this PMU as
