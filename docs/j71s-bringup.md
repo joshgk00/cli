@@ -155,6 +155,10 @@ J71s SPI ID `0x130` selects entry 48 of the captured 96-word
 UART5 ID `0x118` gives 24 MHz, matching the experimental UART clock. This is
 an offline candidate, not a measurement or proof of the running SPI clock;
 do not enable a controller or set timing based solely on this inference.
+The captured tree's SPI3 `function-spi_cs0` and touchscreen
+`function-enable_cs` both reference GPIO 102, but their raw operation arguments
+differ. Their electrical and pinmux semantics are unverified; equal pin
+numbers do not establish that the functions are interchangeable.
 As an offline feasibility check, that project's patches `0007`, `0096`, and
 `0098` at revision `b94d42f78e04c5465e290340a5b6879bbc5956b6` were applied
 in order to an isolated Hoolock kernel checkout at

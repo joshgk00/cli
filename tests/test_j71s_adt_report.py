@@ -23,7 +23,8 @@ def fixture(model=b'iPad6,11\0', provider=1, calibration=b'PRIVATE_CALIBRATION_S
                                 ('multi-touch-calibration', calibration)])
     spi = node('spi3', [('compatible', b'spi-1,samsung\0'), ('reg', word(1)),
                         ('interrupts', word(191)), ('spi-version', word(1)),
-                        ('clock-ids', word(spi_clock_id)), ('clock-gates', word(77))], [touch])
+                        ('clock-ids', word(spi_clock_id)), ('clock-gates', word(77)),
+                        ('function-spi_cs0', word(provider) + b'OIPG' + word(102) + word(65537))], [touch])
     gpio = node('gpio', [('AAPL,phandle', word(1))])
     chosen = node('chosen', [('unique-chip-id', b'IDSECRET')])
     children = [gpio, spi]
@@ -61,6 +62,7 @@ class J71sReport(unittest.TestCase):
         self.assertEqual(result['spi3']['interrupt_words'], [191])
         self.assertEqual(result['spi3']['clock_gate_words'], [77])
         self.assertEqual(result['spi3']['candidate_clock_hz_low_byte_index'], 61538461)
+        self.assertEqual(result['spi3']['functions']['function-spi_cs0']['arguments'], [102, 65537])
         self.assertEqual(result['touch']['functions']['function-reset']['provider'], 'gpio')
         self.assertEqual(result['touch']['functions']['function-reset']['arguments'], [75, 65537])
         self.assertEqual(result['touch']['calibration_bytes'], len(b'PRIVATE_CALIBRATION_SENTINEL'))
