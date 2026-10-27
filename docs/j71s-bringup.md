@@ -168,6 +168,8 @@ after adding the previously tested experimental battery changes. Its config
 matched the J71s config; the compressed image SHA-256 is
 `d244dca6b0a0d030c399321796d85ec6ad9820e0900edf9c863492b6c8984403`.
 It has not been packaged or booted, and it adds no J71s SPI device-tree node.
+An incremental rebuild returned the same image digest; a separate fresh build
+has not yet been compared.
 `tools/j71s_touch_report.py` checks a locally extracted profile offline; it does
 not operate the hardware.
 `tools/j71s_touch_personality.py` summarizes an allowlist of static J71s
