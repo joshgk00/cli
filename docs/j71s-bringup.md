@@ -91,6 +91,12 @@ curves or raw charger functions.
 An older iPad mini Linux project has a charger driver for a different D1946
 PMU; its current-limit register and behavior cannot be assumed to apply to the
 J71s D2365. No charger-control registers have been written in this experiment.
+The Orchard hardware repository also contains a [J71b charging policy](https://github.com/OrchardLinux/hardware/blob/b8d43b2/kernel/modules/j71b/power/j71b_charge_policy.c)
+for an `apple,angel-pmic`. It is restricted to J71b and uses battery, PMIC
+state and handoff checks before a short charging lease. This is a closer PMU
+reference than the older D1946 driver, but its register assumptions, source
+detection, limits and safety behavior have not been validated on J71s. It must
+not be loaded or adapted merely by removing its board guard.
 On the tested host, the RAM gadget enumerated at USB 2 high speed (480 Mb/s)
 and advertised `bMaxPower` 500 mA, matching its kernel's
 `CONFIG_USB_GADGET_VBUS_DRAW=500`. This is the device configuration's declared
