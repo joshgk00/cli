@@ -57,6 +57,8 @@ For iPad 5 Wi-Fi (`iPad6,11` / J71s) bring-up, the source checkout includes
 device tree and prints a limited wiring report without device identity or
 calibration data. Keep the raw ADT private. This offline tool does not add an
 adapter or imply installation support.
+See [J71s bring-up notes](docs/j71s-bringup.md) for observed results and the
+remaining hardware gaps.
 
 `python tools/j71s_touch_report.py J71s.mtprops` checks the legacy Z2 packet
 length and checksums in a locally extracted J71s firmware profile. This is an
