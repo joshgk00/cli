@@ -53,8 +53,9 @@ transfer timed out. UART counters showed transmitted data but no receive data.
 The bootloader's pre-mux pin state instead showed function 1. A later RAM boot
 using function 1 and preserving a bootloader UART control bit produced plausible
 status, capacity, voltage, current, temperature and charge readings on one
-device across three checks. The gauge values have not been compared with iPadOS,
-and charging is not supported by this test. The experiment is not currently
+device across three checks. After iPadOS reported 100% charge, Linux reported
+90%; the cause and accuracy of the readings remain unresolved. Charging is not
+supported by this test. The experiment is not currently
 part of the adapter. A later host-served desktop test showed the same 24%
 battery value in its top bar; it did not validate charging or an installed boot.
 The captured Apple tree identifies a `tristar,cbtl1610` Lightning controller and
@@ -79,6 +80,10 @@ contributor, but do not distinguish host capacity from device-side charging
 configuration; an actual inline measurement and hardware-specific charger
 research would be needed. Do not infer that 10 or 12 W is a minimum required
 to charge.
+For another host, `python3 tools/usb_power_report.py /sys/bus/usb/devices/DEVICE`
+reports the selected USB device's configuration and link speed without reading
+identifiers; replace `DEVICE` with its sysfs directory. It cannot measure the
+host's output or the current entering the iPad.
 The host's Apple MFi fast-charge driver was loaded but not bound to this RAM
 gadget (`05ac:4142`). The [Linux driver](https://github.com/torvalds/linux/blob/master/drivers/usb/misc/apple-mfi-fastcharge.c)
 matches a different product-ID range and uses a device protocol. Changing the
