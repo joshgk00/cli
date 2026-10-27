@@ -53,6 +53,16 @@ The matching iPadOS kernelcache contains D2365-specific LDO function class and
 diagnostic strings, consistent with the Apple tree's PMU-mediated analog
 power function. Strings alone do not identify the rail, voltage, register map,
 or enable sequence, and no PMU power-control registers were accessed.
+An offline inspection of the matching iPadOS 16.7.16 kernelcache found that
+the D2365 `_setLDO` routine indexes a 12-byte-per-entry descriptor table and
+uses fields in the selected entry for a masked register update. The J71s
+touch power function's raw argument is `0x21f`. Applying the separately
+investigated J81 low-byte index interpretation suggests descriptor 31; that
+entry suggests enable register `0x31c`, mask `0x01`. The D2365 argument
+interpretation and this rail's identity, voltage and live register semantics
+remain unverified. `tools/j71s_pmu_research.py` reports only this candidate
+from the exact kernelcache hash and never accesses the device. Do not write or
+read candidate PMU registers based on this static result alone.
 It also identifies a BQ27540 HDQ fuel gauge on UART5. The J71b project has
 experimental HDQ support for that gauge family, but this device's interrupt
 and pin wiring differ. In an experimental J71s RAM boot the UART and a battery
