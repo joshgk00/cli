@@ -35,6 +35,10 @@ and pin wiring differ. In an experimental J71s RAM boot the UART and a battery
 device registered, but all gauge readings returned I/O errors and the HDQ
 transfer timed out. UART counters showed transmitted data but no receive data.
 The experiment is not currently part of the adapter.
+The host-served read-only desktop test was repeated on that experimental kernel:
+the themed desktop, calendar, terminal and on-screen keyboard rendered, and
+software-generated keyboard input appeared in the terminal. The test still did
+not establish physical touch, internal storage or a normal installed boot.
 
 The iPadOS 16.7.16 restore image's `J71s.mtprops` contains profile `C1F15,1`,
 packet type `Z2`, and a constructed packet with valid legacy length and
