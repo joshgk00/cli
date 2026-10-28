@@ -38,7 +38,10 @@ def fixture(model=b'iPad6,11\0', provider=1, calibration=b'PRIVATE_CALIBRATION_S
                                        ('clock-ids', word(280)), ('function-tx', function)], [gauge]))
     if storage:
         ports = [node('pci-bridge0', [('compatible', b'apcie-bridge\0'), ('apcie-port', word(0)),
-                                      ('maximum-link-speed', word(2)), ('nvme-mode', b'')]),
+                                      ('maximum-link-speed', word(2)), ('nvme-mode', b''),
+                                      ('function-perst', word(provider) + b'OIPG' + word(160) + word(0)),
+                                      ('function-clkreq', word(provider) + b'OIPG' + word(164) + word(2)),
+                                      ('t-refclk-to-perst', word(100))]),
                  node('pci-bridge1', [('compatible', b'apcie-bridge\0'), ('apcie-port', word(1)),
                                       ('maximum-link-speed', word(1))])]
         phy_props = [] if phy_tuning is None else [('apcie-phy-tunables', phy_tuning)]
@@ -104,6 +107,10 @@ class J71sReport(unittest.TestCase):
         self.assertEqual(result['storage']['pcie_interrupt_words'], [244])
         self.assertEqual(result['storage']['pcie_clock_gate_words'], [57, 58, 59, 60, 61, 62])
         self.assertTrue(result['storage']['ports']['storage']['nvme_mode_marker_present'])
+        self.assertEqual(result['storage']['ports']['storage']['functions']['function-perst']['arguments'], [160, 0])
+        self.assertEqual(result['storage']['ports']['storage']['functions']['function-clkreq']['arguments'], [164, 2])
+        self.assertEqual(result['storage']['ports']['storage']['refclk_to_perst_word'], 100)
+        self.assertIsNone(result['storage']['ports']['wifi']['refclk_to_perst_word'])
         self.assertEqual(result['storage']['ports']['wifi']['port'], 1)
         self.assertEqual(result['storage']['nvme_mmu_interrupt_words'], [246])
         self.assertEqual(result['storage']['pcie_common_tunable_records'], 1)

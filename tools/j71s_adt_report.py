@@ -116,8 +116,14 @@ def report(blob):
             speed = u32s(bridge.properties['maximum-link-speed'])
             if port != [number] or len(speed) != 1:
                 raise ValueError('Unexpected PCIe port or maximum speed')
+            refclk_delay = bridge.properties.get('t-refclk-to-perst')
+            delay_words = u32s(refclk_delay) if refclk_delay is not None else None
+            if delay_words is not None and len(delay_words) != 1:
+                raise ValueError('Invalid PCIe reference-clock delay')
             ports[label] = {'port': port[0], 'maximum_link_speed_word': speed[0],
-                            'nvme_mode_marker_present': 'nvme-mode' in bridge.properties}
+                            'nvme_mode_marker_present': 'nvme-mode' in bridge.properties,
+                            'functions': functions(bridge, ('function-perst', 'function-clkreq')),
+                            'refclk_to_perst_word': delay_words[0] if delay_words is not None else None}
         storage = {'pcie_reg_words': u32s(pcie.properties['reg']),
                    'pcie_interrupt_words': u32s(pcie.properties['interrupts']),
                    'pcie_clock_gate_words': u32s(pcie.properties['clock-gates']) if 'clock-gates' in pcie.properties else None,
