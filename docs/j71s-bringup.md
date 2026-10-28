@@ -268,3 +268,9 @@ The offline ADT report also indicates whether the PCIe controller contains the
 absent in the tested J71s tree; static analysis suggests it influences a
 storage-mode branch, but the report does not infer register values or establish
 the active driver path. Do not treat this field as an installation check.
+
+For the storage bridge only, the report identifies the allowlisted providers of
+its DART and NVMe MMU force-active functions. This records the relationships in
+the Apple tree; it does not implement those functions or prove the translator
+and storage controller are active. Other ports' force-active functions are not
+interpreted by this J71s storage report.

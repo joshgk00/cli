@@ -41,9 +41,12 @@ def fixture(model=b'iPad6,11\0', provider=1, calibration=b'PRIVATE_CALIBRATION_S
                                       ('maximum-link-speed', word(2)), ('nvme-mode', b''),
                                       ('function-perst', word(provider) + b'OIPG' + word(160) + word(0)),
                                       ('function-clkreq', word(provider) + b'OIPG' + word(164) + word(2)),
-                                      ('t-refclk-to-perst', word(100))]),
+                                      ('t-refclk-to-perst', word(100)),
+                                      ('function-dart_force_active', word(2) + b'DART'),
+                                      ('function-nvme_mmu_force_active', word(3) + b'NVME')]),
                  node('pci-bridge1', [('compatible', b'apcie-bridge\0'), ('apcie-port', word(1)),
-                                      ('maximum-link-speed', word(1))])]
+                                      ('maximum-link-speed', word(1)),
+                                      ('function-dart_force_active', word(99) + b'DART')])]
         phy_props = [] if phy_tuning is None else [('apcie-phy-tunables', phy_tuning)]
         if no_nand_gating:
             phy_props.append(('no-nand-sysclk-gating', b'PRIVATE_MARKER_DATA'))
@@ -51,7 +54,8 @@ def fixture(model=b'iPad6,11\0', provider=1, calibration=b'PRIVATE_CALIBRATION_S
                                       ('interrupts', word(244)),
                                       ('clock-gates', b''.join(word(n) for n in range(57, 63))),
                                       ('apcie-common-tunables', tuning), *phy_props], ports))
-        children.append(node('nvme-mmu0', [('compatible', b'nvme-mmu,s8000\0'), ('reg', word(2)),
+        children.append(node('dart-apcie0', [('AAPL,phandle', word(2))]))
+        children.append(node('nvme-mmu0', [('AAPL,phandle', word(3)), ('compatible', b'nvme-mmu,s8000\0'), ('reg', word(2)),
                                           ('interrupts', word(246))]))
     root_children = [chosen]
     if charging:
@@ -109,11 +113,14 @@ class J71sReport(unittest.TestCase):
         self.assertEqual(result['storage']['pcie_interrupt_words'], [244])
         self.assertEqual(result['storage']['pcie_clock_gate_words'], [57, 58, 59, 60, 61, 62])
         self.assertTrue(result['storage']['ports']['storage']['nvme_mode_marker_present'])
+        self.assertEqual(result['storage']['ports']['storage']['functions']['function-dart_force_active']['provider'], 'storage-dart')
+        self.assertEqual(result['storage']['ports']['storage']['functions']['function-nvme_mmu_force_active']['provider'], 'storage-nvme-mmu')
         self.assertEqual(result['storage']['ports']['storage']['functions']['function-perst']['arguments'], [160, 0])
         self.assertEqual(result['storage']['ports']['storage']['functions']['function-clkreq']['arguments'], [164, 2])
         self.assertEqual(result['storage']['ports']['storage']['refclk_to_perst_word'], 100)
         self.assertIsNone(result['storage']['ports']['wifi']['refclk_to_perst_word'])
         self.assertEqual(result['storage']['ports']['wifi']['port'], 1)
+        self.assertNotIn('function-dart_force_active', result['storage']['ports']['wifi']['functions'])
         self.assertEqual(result['storage']['nvme_mmu_interrupt_words'], [246])
         self.assertEqual(result['storage']['pcie_common_tunable_records'], 1)
         self.assertIsNone(result['storage']['pcie_phy_tunable_records'])

@@ -17,6 +17,8 @@ PROVIDERS = {
     ROOT + '/gpio': 'gpio',
     ROOT + '/pmgr': 'pmgr',
     ROOT + '/i2c0/pmu': 'pmu',
+    ROOT + '/dart-apcie0': 'storage-dart',
+    ROOT + '/nvme-mmu0': 'storage-nvme-mmu',
 }
 FUNCTIONS = ('function-clock_enable', 'function-power_ana', 'function-display_sync',
              'function-power_ldo', 'function-reset', 'function-enable_cs')
@@ -122,7 +124,10 @@ def report(blob):
                 raise ValueError('Invalid PCIe reference-clock delay')
             ports[label] = {'port': port[0], 'maximum_link_speed_word': speed[0],
                             'nvme_mode_marker_present': 'nvme-mode' in bridge.properties,
-                            'functions': functions(bridge, ('function-perst', 'function-clkreq')),
+                            'functions': functions(bridge, ('function-perst', 'function-clkreq') +
+                                                   (('function-dart_force_active',
+                                                     'function-nvme_mmu_force_active')
+                                                    if number == 0 else ())),
                             'refclk_to_perst_word': delay_words[0] if delay_words is not None else None}
         storage = {'no_nand_sysclk_gating_present': 'no-nand-sysclk-gating' in pcie.properties,
                    'pcie_reg_words': u32s(pcie.properties['reg']),
