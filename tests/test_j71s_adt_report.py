@@ -15,7 +15,7 @@ def node(name, props=(), children=()):
 
 def fixture(model=b'iPad6,11\0', provider=1, calibration=b'PRIVATE_CALIBRATION_SENTINEL',
             battery=False, storage=False, pcie_compatible=b'apcie,s8000\0',
-            tuning=b'PRIVATE_TUNABLE_SENTINEL', phy_tuning=None, charging=False, clock_table=True, spi_clock_id=304):
+            tuning=b'PRIVATE_TUNABLE_SENTINEL', phy_tuning=None, charging=False, clock_table=True, spi_clock_id=304, no_nand_gating=False):
     word = lambda n: struct.pack('<I', n)
     touch = node('multi-touch', [('compatible', b'multi-touch,j72\0'),
                                 ('interrupts', word(65) + word(0)),
@@ -45,6 +45,8 @@ def fixture(model=b'iPad6,11\0', provider=1, calibration=b'PRIVATE_CALIBRATION_S
                  node('pci-bridge1', [('compatible', b'apcie-bridge\0'), ('apcie-port', word(1)),
                                       ('maximum-link-speed', word(1))])]
         phy_props = [] if phy_tuning is None else [('apcie-phy-tunables', phy_tuning)]
+        if no_nand_gating:
+            phy_props.append(('no-nand-sysclk-gating', b'PRIVATE_MARKER_DATA'))
         children.append(node('apcie', [('compatible', pcie_compatible), ('reg', word(1)),
                                       ('interrupts', word(244)),
                                       ('clock-gates', b''.join(word(n) for n in range(57, 63))),
@@ -116,6 +118,13 @@ class J71sReport(unittest.TestCase):
         self.assertEqual(result['storage']['pcie_common_tunable_records'], 1)
         self.assertIsNone(result['storage']['pcie_phy_tunable_records'])
         self.assertNotIn('PRIVATE_TUNABLE_SENTINEL', json.dumps(result))
+
+    def test_storage_reports_marker_presence_without_its_contents(self):
+        absent = report(fixture(storage=True))
+        present = report(fixture(storage=True, no_nand_gating=True))
+        self.assertFalse(absent['storage']['no_nand_sysclk_gating_present'])
+        self.assertTrue(present['storage']['no_nand_sysclk_gating_present'])
+        self.assertNotIn('PRIVATE_MARKER_DATA', json.dumps(present))
 
     def test_phy_tunables_are_counted_without_exposing_values(self):
         private = b'PRIVATE_PHY_TABLE_BYTES!' * 2

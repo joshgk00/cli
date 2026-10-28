@@ -262,3 +262,9 @@ mask/value width. Run `python -m unittest tests.test_j71s_pcie_tunables` for
 synthetic checks. It neither prints tuning contents nor performs MMIO; a valid
 record does not establish that the chosen window, write order or hardware
 operation is safe.
+
+The offline ADT report also indicates whether the PCIe controller contains the
+`no-nand-sysclk-gating` marker, without printing its contents. The marker is
+absent in the tested J71s tree; static analysis suggests it influences a
+storage-mode branch, but the report does not infer register values or establish
+the active driver path. Do not treat this field as an installation check.

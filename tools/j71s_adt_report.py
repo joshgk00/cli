@@ -124,7 +124,8 @@ def report(blob):
                             'nvme_mode_marker_present': 'nvme-mode' in bridge.properties,
                             'functions': functions(bridge, ('function-perst', 'function-clkreq')),
                             'refclk_to_perst_word': delay_words[0] if delay_words is not None else None}
-        storage = {'pcie_reg_words': u32s(pcie.properties['reg']),
+        storage = {'no_nand_sysclk_gating_present': 'no-nand-sysclk-gating' in pcie.properties,
+                   'pcie_reg_words': u32s(pcie.properties['reg']),
                    'pcie_interrupt_words': u32s(pcie.properties['interrupts']),
                    'pcie_clock_gate_words': u32s(pcie.properties['clock-gates']) if 'clock-gates' in pcie.properties else None,
                    'ports': ports,
