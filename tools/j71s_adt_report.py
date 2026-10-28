@@ -101,8 +101,10 @@ def report(blob):
         if nvme.properties.get('compatible', b'').rstrip(b'\0') != b'nvme-mmu,s8000':
             raise ValueError('Unexpected NVMe MMU compatible')
         tuning = pcie.properties.get('apcie-common-tunables')
-        if tuning is not None and len(tuning) % 24:
-            raise ValueError('Invalid PCIe local-tunable record length')
+        phy_tuning = pcie.properties.get('apcie-phy-tunables')
+        for table in (tuning, phy_tuning):
+            if table is not None and len(table) % 24:
+                raise ValueError('Invalid PCIe local-tunable record length')
         ports = {}
         for number, label in ((0, 'storage'), (1, 'wifi')):
             bridge = nodes.get(ROOT + f'/apcie/pci-bridge{number}')
@@ -122,7 +124,8 @@ def report(blob):
                    'ports': ports,
                    'nvme_mmu_reg_words': u32s(nvme.properties['reg']),
                    'nvme_mmu_interrupt_words': u32s(nvme.properties['interrupts']),
-                   'pcie_common_tunable_records': len(tuning) // 24 if tuning is not None else None}
+                   'pcie_common_tunable_records': len(tuning) // 24 if tuning is not None else None,
+                   'pcie_phy_tunable_records': len(phy_tuning) // 24 if phy_tuning is not None else None}
     tristar = nodes.get(ROOT + '/i2c0/tristar')
     charger = nodes.get('/device-tree/charger')
     charging = None

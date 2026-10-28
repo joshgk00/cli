@@ -15,7 +15,7 @@ def node(name, props=(), children=()):
 
 def fixture(model=b'iPad6,11\0', provider=1, calibration=b'PRIVATE_CALIBRATION_SENTINEL',
             battery=False, storage=False, pcie_compatible=b'apcie,s8000\0',
-            tuning=b'PRIVATE_TUNABLE_SENTINEL', charging=False, clock_table=True, spi_clock_id=304):
+            tuning=b'PRIVATE_TUNABLE_SENTINEL', phy_tuning=None, charging=False, clock_table=True, spi_clock_id=304):
     word = lambda n: struct.pack('<I', n)
     touch = node('multi-touch', [('compatible', b'multi-touch,j72\0'),
                                 ('interrupts', word(65) + word(0)),
@@ -41,10 +41,11 @@ def fixture(model=b'iPad6,11\0', provider=1, calibration=b'PRIVATE_CALIBRATION_S
                                       ('maximum-link-speed', word(2)), ('nvme-mode', b'')]),
                  node('pci-bridge1', [('compatible', b'apcie-bridge\0'), ('apcie-port', word(1)),
                                       ('maximum-link-speed', word(1))])]
+        phy_props = [] if phy_tuning is None else [('apcie-phy-tunables', phy_tuning)]
         children.append(node('apcie', [('compatible', pcie_compatible), ('reg', word(1)),
                                       ('interrupts', word(244)),
                                       ('clock-gates', b''.join(word(n) for n in range(57, 63))),
-                                      ('apcie-common-tunables', tuning)], ports))
+                                      ('apcie-common-tunables', tuning), *phy_props], ports))
         children.append(node('nvme-mmu0', [('compatible', b'nvme-mmu,s8000\0'), ('reg', word(2)),
                                           ('interrupts', word(246))]))
     root_children = [chosen]
@@ -106,7 +107,17 @@ class J71sReport(unittest.TestCase):
         self.assertEqual(result['storage']['ports']['wifi']['port'], 1)
         self.assertEqual(result['storage']['nvme_mmu_interrupt_words'], [246])
         self.assertEqual(result['storage']['pcie_common_tunable_records'], 1)
+        self.assertIsNone(result['storage']['pcie_phy_tunable_records'])
         self.assertNotIn('PRIVATE_TUNABLE_SENTINEL', json.dumps(result))
+
+    def test_phy_tunables_are_counted_without_exposing_values(self):
+        private = b'PRIVATE_PHY_TABLE_BYTES!' * 2
+        self.assertEqual(len(private), 48)
+        result = report(fixture(storage=True, phy_tuning=private))
+        self.assertEqual(result['storage']['pcie_phy_tunable_records'], 2)
+        self.assertNotIn('PRIVATE_PHY_TABLE_BYTES', json.dumps(result))
+        with self.assertRaisesRegex(ValueError, 'tunable record length'):
+            report(fixture(storage=True, phy_tuning=b'partial'))
 
     def test_storage_rejects_unexpected_controller(self):
         with self.assertRaisesRegex(ValueError, 'Unexpected PCIe'):
