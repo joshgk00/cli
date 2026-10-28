@@ -254,3 +254,11 @@ On the tested device the live field was 1,024 bytes and nonzero; the stock
 restore image's tree contained a 31-byte field. The difference does not prove
 what either field contains or whether it can be used by a Linux driver.
 Do not commit firmware or raw captured data.
+
+The experimental helper `tools/j71s_pcie_tunables.py` validates the structure
+of private PCIe local-tunable records against a caller-supplied register-window
+size. It checks record length, supported access widths, alignment, bounds and
+mask/value width. Run `python -m unittest tests.test_j71s_pcie_tunables` for
+synthetic checks. It neither prints tuning contents nor performs MMIO; a valid
+record does not establish that the chosen window, write order or hardware
+operation is safe.
