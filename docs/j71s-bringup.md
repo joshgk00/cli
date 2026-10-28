@@ -36,7 +36,9 @@ make those register writes safe. The original topology inspection did not
 access PCIe or NVMe registers. A later diagnostic read three selected PCIe
 shared-window registers without writing them; the reads did not return all
 ones, while DART registers did. No host, physical DMA or storage endpoint
-was enabled.
+was enabled. A later read-only check of a port register in the overlapping
+PCIe/NVMe-MMU window returned all ones; its meaning remains unknown, and the
+register was not written.
 The separate [J81 PCIe investigation](https://github.com/mattonik/ipad-nixos/blob/b94d42f78e04c5465e290340a5b6879bbc5956b6/research/t7000-pcie-hardware-findings.md)
 reports that enabling its DART device caused a boot hang. J81 is a different
 SoC; this is not a prediction for J71s, but is evidence that merely enabling a
