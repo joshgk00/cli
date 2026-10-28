@@ -42,6 +42,10 @@ The Apple tree places an `s3e` node under bridge 0, which has an `nvme-mode`
 marker and maximum link-speed value 2; the BCM4355 Wi-Fi node is under bridge 1,
 with maximum link-speed value 1. These are topology descriptions and limits,
 not evidence that either link has trained or that storage access is safe.
+The captured tree also associates bridge 0's `function-dart_force_active`
+with `dart-apcie0` and bridge 1's corresponding function with `dart-apcie1`.
+This identifies relationships between the bridge and its DART; it does not
+explain how to make the DART available or establish a safe register sequence.
 An offline comparison using m1n1's 24-byte local-tunable record layout found
 34 S8000 common-tuning records in the captured tree versus 38 entries in the
 J71b T8010 driver's common-tuning table; the sequences are not identical.
