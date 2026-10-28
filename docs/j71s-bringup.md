@@ -53,6 +53,10 @@ The captured tree also associates bridge 0's `function-dart_force_active`
 with `dart-apcie0` and bridge 1's corresponding function with `dart-apcie1`.
 This identifies relationships between the bridge and its DART; it does not
 explain how to make the DART available or establish a safe register sequence.
+The project's experimental J71b driver labels one common-window offset as a
+link-rate register, while the Orchard kernel's newer Apple PCIe driver labels a
+port-window offset as link command/status. These names describe other hardware;
+they do not establish the meaning or safe use of corresponding S8000 offsets.
 An offline comparison using m1n1's 24-byte local-tunable record layout found
 34 S8000 common-tuning records in the captured tree versus 38 entries in the
 J71b T8010 driver's common-tuning table; the sequences are not identical.
