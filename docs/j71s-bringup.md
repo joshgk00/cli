@@ -26,7 +26,10 @@ compatibility.
 
 An offline translation of the captured Apple tree locates the S8000 PCIe
 configuration range at `0x610000000` and its first PCIe DART at `0x601008000`;
-the NVMe MMU describes `0x601004000` and `0x601000000`. The J71b implementation
+the NVMe MMU describes `0x601004000` and `0x601000000`. An independent m1n1
+translation shows those same two windows in the PCIe controller's resource
+list, in the opposite order. Their overlap is a device-tree description, not
+proof of their register functions or safety. The J71b implementation
 uses some of the same addresses, but also has T8010-specific initialization
 and tuning. Address similarities alone do not establish S8000 compatibility or
 make those register writes safe. No PCIe or NVMe registers were accessed.
