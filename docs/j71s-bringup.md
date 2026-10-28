@@ -32,7 +32,11 @@ list, in the opposite order. Their overlap is a device-tree description, not
 proof of their register functions or safety. The J71b implementation
 uses some of the same addresses, but also has T8010-specific initialization
 and tuning. Address similarities alone do not establish S8000 compatibility or
-make those register writes safe. No PCIe or NVMe registers were accessed.
+make those register writes safe. The original topology inspection did not
+access PCIe or NVMe registers. A later diagnostic read three selected PCIe
+shared-window registers without writing them; the reads did not return all
+ones, while DART registers did. No host, physical DMA or storage endpoint
+was enabled.
 The separate [J81 PCIe investigation](https://github.com/mattonik/ipad-nixos/blob/b94d42f78e04c5465e290340a5b6879bbc5956b6/research/t7000-pcie-hardware-findings.md)
 reports that enabling its DART device caused a boot hang. J81 is a different
 SoC; this is not a prediction for J71s, but is evidence that merely enabling a
